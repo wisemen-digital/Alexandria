@@ -10,38 +10,16 @@ $ gem install cocoapods-alexandria
 
 ## Important
 
-In the examples below the target 'Alexander' could either be an existing target of a project managed by cocapods for which you'd like to run a swift script **or** it could be fictitious, for example if you wish to run this on a standalone Podfile and get the frameworks you need for adding to your xcode project manually.
+This library depends on XcodeGen being installed, and you having a (correct) `project.yml` file for project generation.
 
 ## Usage 
 
 Write a simple Podfile, like this:
 
-### MacOS
-
-```ruby
-platform :osx, '11.1'
-
-plugin 'cocoapods-alexandria'
-
-target 'Alexander' do
-  pod 'Alamofire'
-end
-```
-
-### iOS 
-
 ```ruby
 platform :ios, '12.0'
 
-plugin 'cocoapods-alexandria',
-  :environment_configs => {
-    'Config1-Debug' => 'Configs/Config1.xcconfig',
-    'Config1-Release' => 'Configs/Config1.xcconfig',
-    'Config2-Debug' => 'Configs/Config2.xcconfig',
-    'Config2-Release' => 'Configs/Config2.xcconfig',
-  },
-  :force_bitcode => false,
-  :xcodegen_dependencies_file => 'customDependenciesFile.yml'
+plugin 'cocoapods-alexandria'
 
 target 'Alexander' do
   pod 'Alamofire'
@@ -51,22 +29,46 @@ end
 then run this:
 
 ```bash
-pod install
+bundler exec pod install
 ```
 
-and you will end up with dynamic frameworks:
+Locally, it will **first** generate the project using XcodeGen, and then integratie with CocoaPods.
 
-```
-$ tree Rome/
-Rome/
-└── Alamofire.framework
-```
+On CI, it'll first install the pods, compile them if needed, and only then generate your project using XcodeGen. To integratie with these binary frameworks, it'll generate the necessary information into the dependencies file, which you should import in your XcodeGen project.
 
 ## Advanced Usage
 
 ### Environment Configuration Files
 
-TODO: write documentation
+Used to define the xcconfig files for each target and configuration combination. You can customise it using `environment_configs`:
+
+```ruby
+platform :ios, '12.0'
+
+plugin 'cocoapods-alexandria',
+  :environment_configs => {
+    'Alexander' => {
+      'Config1-Debug' => 'Configs/Config1.xcconfig',
+      'Config1-Release' => 'Configs/Config1.xcconfig',
+      'Config2-Debug' => 'Configs/Config2.xcconfig',
+      'Config2-Release' => 'Configs/Config2.xcconfig'
+    }
+  }
+
+target 'Alexander' do
+  pod 'Alamofire'
+end
+```
+
+By default, it will use the following path for each combination, where `$CONFIG_ENV` is the first part of the configuration name (`Development-Debug` becomes `Development`):
+
+```bash
+Supporting Files/Settings-${CONFIG_ENV}.xcconfig
+```
+
+Locally it will include this configuration file from each CocoaPods's `xcconfig` file, so that you can configure target settings while still using CocoaPods.
+
+On CI, CocoaPods's settings are not used, and instead only the environment configs will be used.
 
 ### Bitcode generation
 
@@ -85,7 +87,44 @@ end
 
 ### XcodeGen Dependencies File
 
-TODO: write documentation
+By default set to `projectDependencies.yml`, this defines the XcodeGen integration file. You can point Alexandria to a custom path using `xcodegen_dependencies_file`:
+
+```ruby
+platform :osx, '10.10'
+
+plugin 'cocoapods-alexandria',
+  :xcodegen_dependencies_file => 'customDependenciesFile.yml'
+
+target 'Alexander' do
+  pod 'Alamofire'
+end
+```
+
+The plugin will generate some XcodeGen settings (for each target) to this file, which you can then include from your project file using:
+
+```yaml
+include:
+  - projectDependencies.yml
+```
+
+#### How it works
+
+Locally this file will be empty. On CI though, it'll contain all the information needed to link with the binary frameworks, as well as your target's configurations.
+
+For example:
+
+```yaml
+targets:
+  Alexander:
+    configFiles:
+      Development-Debug: Application/Supporting Files/Settings-Development.xcconfig
+      Development-Release: Application/Supporting Files/Settings-Development.xcconfig
+      Production-Debug: Application/Supporting Files/Settings-Production.xcconfig
+      Production-Release: Application/Supporting Files/Settings-Production.xcconfig
+    dependencies:
+      - framework: Rome/Alamofire.framework
+        embed: true
+```
 
 ## Authors
 
