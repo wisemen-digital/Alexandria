@@ -95,7 +95,7 @@ module PodAlexandria
       if File.directory?(path)
         FileUtils.remove_dir(path, true)
       else
-        Pod::UI.warning "🤔  Could not delete #{path}, it does not exist! (this is normal for newly added pods)"
+        Pod::UI.warn "🤔  Could not delete #{path}, it does not exist! (this is normal for newly added pods)"
       end
     end
 
