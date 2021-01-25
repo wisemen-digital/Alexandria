@@ -20,7 +20,11 @@ module PodAlexandria
       
       spec_names.map { |root_name, module_name|
         next if skip_build?(root_name, module_name, sdk)
-        xcodebuild(root_name, module_name, sdk, deployment_target)
+        if File.directory?(build_path(target, module_name, sdk))
+          build_path(target, module_name, sdk)
+        else
+          xcodebuild(root_name, module_name, sdk, deployment_target)
+        end
       }.compact
     end
 
@@ -31,8 +35,7 @@ module PodAlexandria
     end
 
     def skip_build?(target, module_name, sdk)
-      File.directory?(build_path(target, module_name, sdk)) ||
-        File.directory?(destination_path(module_name)) ||
+      File.directory?(destination_path(module_name)) ||
         !is_native_target?(target)
     end
 
