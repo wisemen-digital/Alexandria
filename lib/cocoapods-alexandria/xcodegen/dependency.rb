@@ -7,16 +7,13 @@ module PodAlexandria
     end
 
     def path
-      ['framework', 'xcframework'].map { |extension|
-        "Rome/#{value}.#{extension}" 
-      }.select { |path|
-        File.directory? path
-      }.first
+      binary = Dir["Rome/*.{framework,xcframework}/**/#{binary_name}"].first
+      binary&.split(File::SEPARATOR)&.first(2)&.join(File::SEPARATOR)
     end
 
     def sdk
-      if value.start_with? '-l'
-        "lib#{value.delete_prefix('-l')}.tbd"
+      if is_library?
+        "lib#{module_name}.tbd"
       else
         "#{value}.framework"
       end
@@ -34,6 +31,24 @@ module PodAlexandria
         binary = "#{path}/#{value}"
       end
       !%x(file #{binary} | grep dynamic).to_s.strip.empty?
+    end
+
+    private
+
+    def is_library?
+      value.start_with? '-l'
+    end
+
+    def binary_name
+      if is_library?
+        "lib#{module_name}.a"
+      else
+        module_name
+      end
+    end
+
+    def module_name
+      value.delete_prefix('-l')
     end
   end
 end
