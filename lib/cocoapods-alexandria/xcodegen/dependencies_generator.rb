@@ -4,12 +4,12 @@ module PodAlexandria
   class XcodeGen
     # Generate the project dependencies file, adding frameworks to the right targets
     # and also checking if they are linked dynamically or not.
-    def self.generate_dependencies(installer_context, outputFile, configurations)
+    def self.generate_dependencies(installer_context, options)
       targets = installer_context.umbrella_targets.map { |target|
-        generate_for_target(installer_context, target, configurations)
+        generate_for_target(installer_context, target, options.environment_configs_for(target.cocoapods_target_label))
       }.to_h
 
-      File.open(outputFile, 'w') { |file|
+      File.open(options.xcodegen_dependencies_file, 'w') { |file|
         YAML::dump({ 'targets' => targets }, file)
       }
     end

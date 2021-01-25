@@ -21,11 +21,7 @@ module PodAlexandria
       cache.cache_lockfile
 
       Pod::UI.title "Generating project using XcodeGen"
-      XcodeGen::generate_dependencies(
-        installer_context,
-        options.xcodegen_dependencies_file,
-        options.environment_configs
-      )
+      XcodeGen::generate_dependencies(installer_context, options)
       XcodeGen::generate
     end
   end

@@ -20,7 +20,8 @@ module PodAlexandria
     def include_user_configs_in_pods_xcconfigs
       umbrella_targets.each do |target|
         pods_project.configurations.each do |config|
-          append_include_to_config(target, config, options.environment_configs[config])
+          config_path = options.environment_configs_for(target.cocoapods_target_label)[config]
+          append_include_to_config(target, config, config_path)
         end
       end
     end
