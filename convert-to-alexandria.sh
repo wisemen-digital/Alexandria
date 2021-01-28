@@ -18,6 +18,9 @@ fix_gemfile() {
   echo "- modify Gemfile (replace rome with alexandria)"
 
   sed -i '' "s/gem .cocoapods-rome.*/gem 'cocoapods-alexandria', '~> 0.1'/g" Gemfile
+  if grep -q "gem .cocoapods.*1.\\d\\..*" Gemfile; then
+    sed -i '' "s/gem .cocoapods.,.*/gem 'cocoapods', '~> 1.10.0'/g" Gemfile
+  fi
   bundler install --quiet
 }
 
@@ -30,13 +33,17 @@ fix_podfile() {
 
   sed -i '' -e ':a' -e 'N' -e '$!ba' \
     -e 's/raise .Please.*Bundler.\n//g' \
-    -e "s/# Pre-compile pods\n//g" \
-    -e "s/plugin .cocoapods-rome.*//g" Podfile
+    -e 's/# Pre-compile pods\n//g' Podfile
   sed -i '' "/platform :ios.*/ a\\
 inhibit_all_warnings!\\
 ensure_bundler! '> 2.0'\\
 plugin 'cocoapods-alexandria'\\
 " Podfile
+  sed -i '' -e ':a' -e 'N' -e '$!ba' \
+    -e "s/plugin .cocoapods-rome.*\(FileUtils.cp_r.*remove_destination => true.\).*/post_install do |installer|\\
+  require 'fileutils'\\
+  \1\\
+end/g" Podfile
 
   if grep -q "^\\s*project .*," Podfile; then
     echo "ℹ️  It seems like your Podfile already contains a 'project ...' definition. Make sure it defines all your debug/release configurations (with the correct names)!"
