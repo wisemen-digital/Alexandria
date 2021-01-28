@@ -92,7 +92,17 @@ nuke_xcode() {
 EOF
 }
 
+fix_bitrise() {
+  if test -f bitrise.yml; then
+    echo "- fix bitrise.yml"
+
+    sed -i '' "s/\(\( *\)bundle install\)/\1\\
+\2curl -L -o \/tmp\/xcodegen.zip \"https:\/\/github.com\/yonaskolb\/XcodeGen\/releases\/download\/2.18.0\/xcodegen.zip\" \&\& unzip -q \/tmp\/xcodegen.zip -d \/tmp \&\& \/tmp\/xcodegen\/install.sh/" bitrise.yml
+  fi
+}
+
 finish_git() {
+  echo "- tweak gitignore and commit changes"
   cat >> .gitignore <<EOF
 
 # Xcode projects (because we use XcodeGen)
@@ -100,6 +110,10 @@ finish_git() {
 *.xcworkspace
 EOF
   git add -f .gitignore Gemfile Gemfile.lock Podfile Podfile.lock project.yml projectDependencies.yml "$TEMPLATE_FILE"
+  if test -f bitrise.yml; then
+    git add -f bitrise.yml
+  fi
+  git commit -m "Switch from CocoaPods Rome to Alexandria"
 }
 
 move_configs
