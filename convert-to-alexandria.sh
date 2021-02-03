@@ -136,12 +136,8 @@ fix_podfile
 fix_project
 nuke_xcode
 bundler exec pod install
+fix_bitrise
 finish_git
 
 echo
 echo "🎉  Done!"
-
-if test -f "bitrise.yml"; then
-  echo
-  echo "Please ask your SysOps to add the XcodeGen install step in Bitrise!"
-fi
