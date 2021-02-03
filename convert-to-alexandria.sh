@@ -82,7 +82,7 @@ fix_project() {
 
   if grep -q "dependencies:" project.yml; then
     echo "ℹ️  Seems like you manually added dependencies to your project. This SHOULD no longer be necessary, so we'll remove it for now."
-    sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/ *dependencies:\n.*\n\( *settings:\n\)/\1/g' project.yml
+    sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/[ #]*dependencies:\n.*\n\( *settings:\n\)/\1/g' project.yml
   fi
 }
 
