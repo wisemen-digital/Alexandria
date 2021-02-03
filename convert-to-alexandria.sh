@@ -39,11 +39,25 @@ inhibit_all_warnings!\\
 ensure_bundler! '> 2.0'\\
 plugin 'cocoapods-alexandria'\\
 " Podfile
-  sed -i '' -e ':a' -e 'N' -e '$!ba' \
-    -e "s/plugin .cocoapods-rome.*\(FileUtils.cp_r.*remove_destination => true.\).*/post_install do |installer|\\
+
+  if grep -qi "post_install" Podfile; then
+    echo "ℹ️  It seems like your Podfile already contains a 'post_install' hook. We've tried adding the copy acknowledgements step, but please verify everything is correct!"
+    
+    TARGET_NAME=`cat Podfile | grep -Ei "target .(.*)." | head -n 1 | cut -d " " -f 2 | cut -c 2- | rev | cut -c 2- | rev`
+    sed -i '' -e ':a' -e 'N' -e '$!ba' \
+      -e "s/plugin .cocoapods-rome.*//g" Podfile
+    sed -i '' "/post_install .*/ a\\
+  require 'fileutils'\\
+  FileUtils.cp_r('Pods/Target Support Files/Pods-${TARGET_NAME}/Pods-${TARGET_NAME}-Acknowledgements.plist', 'Application/Resources/Settings.bundle/Acknowledgements.plist', :remove_destination => true)\\
+\\
+" Podfile
+  else
+    sed -i '' -e ':a' -e 'N' -e '$!ba' \
+      -e "s/plugin .cocoapods-rome.*\(FileUtils.cp_r.*remove_destination => true.\).*/post_install do |installer|\\
   require 'fileutils'\\
   \1\\
 end/g" Podfile
+  fi
 
   if grep -q "^\\s*project .*," Podfile; then
     echo "ℹ️  It seems like your Podfile already contains a 'project ...' definition. Make sure it defines all your debug/release configurations (with the correct names)!"
