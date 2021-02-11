@@ -42,10 +42,10 @@ module PodAlexandria
 
     def self.get_dependencies_from_xcconfig(file)
       File.readlines(file).select { |line| line.start_with?('OTHER_LDFLAGS') }.first
-        .split('=')[1].tr('"', '') # get value (and remove quotes)
-        .gsub('-framework', '').gsub('-ObjC', '') # remove unneeded flags
-        .split.drop(1) # remove inherited
-        .map { |d| Dependency.new(d) }
+        &.split('=')&.at(1)&.tr('"', '') # get value (and remove quotes)
+        &.gsub('-framework', '')&.gsub('-ObjC', '') # remove unneeded flags
+        &.split&.drop(1) # remove inherited
+        &.map { |d| Dependency.new(d) } || []
     end
   end
 end
