@@ -1,10 +1,29 @@
 module PodAlexandria
   class Dependency
-    attr_reader :value
+    attr_reader :flag
+    attr_reader :module_name
 
     def initialize(value)
-      @value = value
+      @flag = value.start_with?('-wf') ? 'wf' : value[1]
+      @module_name = value.delete_prefix('-l').delete_prefix('-f').delete_prefix('-wf')
     end
+
+    def xcodegen_info
+      if exists?
+        {
+          'framework' => path,
+          'embed' => is_dynamic?,
+          'weak' => is_weak?
+        }
+      else
+        {
+          'sdk' => sdk,
+          'weak' => is_weak?
+        }
+      end
+    end
+
+    private
 
     def path
       binary = Dir["Rome/*.{framework,xcframework}/**/#{binary_name}"].first
@@ -15,7 +34,7 @@ module PodAlexandria
       if is_library?
         "lib#{module_name}.tbd"
       else
-        "#{value}.framework"
+        "#{module_name}.framework"
       end
     end
 
@@ -26,17 +45,19 @@ module PodAlexandria
     def is_dynamic?
       if path.end_with? 'xcframework'
         any_arch = Dir["#{path}/*/*.framework"].first
-        binary = "#{any_arch}/#{value}"
+        binary = "#{any_arch}/#{module_name}"
       else
-        binary = "#{path}/#{value}"
+        binary = "#{path}/#{module_name}"
       end
       !%x(file #{binary} | grep dynamic).to_s.strip.empty?
     end
 
-    private
-
     def is_library?
-      value.start_with? '-l'
+      flag == 'l'
+    end
+
+    def is_weak?
+      flag == 'wf'
     end
 
     def binary_name
@@ -45,10 +66,6 @@ module PodAlexandria
       else
         module_name
       end
-    end
-
-    def module_name
-      value.delete_prefix('-l')
     end
   end
 end

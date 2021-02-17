@@ -24,13 +24,7 @@ module PodAlexandria
         target_name,
         {
           'configFiles' => configurations,
-          'dependencies' => get_dependencies_from_xcconfig(xcconfig).map { |dependency|
-            if dependency.exists?
-              { 'framework' => dependency.path, 'embed' => dependency.is_dynamic? }
-            else
-              { 'sdk' => dependency.sdk }
-            end
-          }
+          'dependencies' => get_dependencies_from_xcconfig(xcconfig).map(&:xcodegen_info)
         }
       ]
     end
@@ -43,7 +37,8 @@ module PodAlexandria
     def self.get_dependencies_from_xcconfig(file)
       File.readlines(file).select { |line| line.start_with?('OTHER_LDFLAGS') }.first
         &.split('=')&.at(1)&.tr('"', '') # get value (and remove quotes)
-        &.gsub('-framework', '')&.gsub('-ObjC', '') # remove unneeded flags
+        &.gsub('-framework ', '-f')&.gsub('-weak_framework ', '-wf') # replace framework with fake linker flag
+        &.gsub('-ObjC', '') # remove unneeded flags
         &.split&.drop(1) # remove inherited
         &.map { |d| Dependency.new(d) } || []
     end
