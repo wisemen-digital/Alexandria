@@ -6,7 +6,12 @@ module PodAlexandria
     # and also checking if they are linked dynamically or not.
     def self.generate_dependencies(installer_context, options)
       targets = installer_context.umbrella_targets.map { |target|
-        generate_for_target(installer_context, target, options.environment_configs_for(target.cocoapods_target_label))
+        generate_for_target(
+          installer_context,
+          target,
+          options.environment_configs_for(target.cocoapods_target_label),
+          options.allow_embed_dependencies_for(target.cocoapods_target_label)
+        )
       }.to_h
 
       File.open(options.xcodegen_dependencies_file, 'w') { |file|
@@ -16,7 +21,7 @@ module PodAlexandria
 
     private
 
-    def self.generate_for_target(installer_context, target, configurations)
+    def self.generate_for_target(installer_context, target, configurations, allow_embed)
       target_name = target.cocoapods_target_label.sub(/^Pods-/, '')
       xcconfig = config_file_for_target(installer_context, target)
 
@@ -24,13 +29,13 @@ module PodAlexandria
         target_name,
         {
           'configFiles' => configurations,
-          'dependencies' => get_dependencies_from_xcconfig(xcconfig).map(&:xcodegen_info)
+          'dependencies' => get_dependencies_from_xcconfig(xcconfig).map { |d| d.xcodegen_info(allow_embed) }
         }
       ]
     end
 
     def self.config_file_for_target(installer_context, target)
-      Dir["#{installer_context.sandbox_root}/Target Support Files/#{target.cocoapods_target_label}/#{target.cocoapods_target_label}.*-release.xcconfig"]
+      Dir["#{installer_context.sandbox_root}/Target Support Files/#{target.cocoapods_target_label}/#{target.cocoapods_target_label}.*.xcconfig"]
         .first
     end
 

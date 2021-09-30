@@ -8,11 +8,11 @@ module PodAlexandria
       @module_name = value.delete_prefix('-l').delete_prefix('-f').delete_prefix('-wf')
     end
 
-    def xcodegen_info
+    def xcodegen_info(allow_embed)
       if exists?
         {
           'framework' => path,
-          'embed' => is_dynamic?,
+          'embed' => is_dynamic? && allow_embed,
           'weak' => is_weak?
         }
       else

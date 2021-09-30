@@ -107,6 +107,29 @@ include:
   - projectDependencies.yml
 ```
 
+### Opt-out of dependency embedding
+
+By default, every dependency that's a dynamic library will be embedded in each target. But in some cases, you may want to opt-out of this behaviour.
+
+For example, in your notification service extension, you may not want to embed the OneSignal library, as it's already embedded in your app (and app extensions cannot contain libraries).
+
+To customise this, define the list of targets that should not embed dependencies, using the `do_not_embed_dependencies_in_targets` option:
+
+```ruby
+platform :osx, '10.10'
+
+plugin 'cocoapods-alexandria',
+  :do_not_embed_dependencies_in_targets => ['AlexanderExtension']
+
+target 'Alexander' do
+  pod 'OneSignal'
+end
+
+target 'AlexanderExtension' do
+  pod 'OneSignal'
+end
+```
+
 #### How it works
 
 Locally this file will be empty. On CI though, it'll contain all the information needed to link with the binary frameworks, as well as your target's configurations.

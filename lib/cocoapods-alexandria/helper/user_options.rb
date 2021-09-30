@@ -3,15 +3,21 @@ module PodAlexandria
     attr_reader :environment_configs
     attr_reader :force_bitcode
     attr_reader :xcodegen_dependencies_file
+    attr_reader :do_not_embed_dependencies_in_targets
 
     def initialize(installer_context, user_options)
       @environment_configs = user_options.fetch('environment_configs', default_configurations(installer_context))
       @force_bitcode = user_options.fetch('force_bitcode', true)
       @xcodegen_dependencies_file = user_options.fetch('xcodegen_dependencies_file', 'projectDependencies.yml')
+      @do_not_embed_dependencies_in_targets = user_options.fetch('do_not_embed_dependencies_in_targets', [])
     end
 
     def environment_configs_for(target)
       environment_configs[normalize_target(target)]
+    end
+
+    def allow_embed_dependencies_for(target)
+      !do_not_embed_dependencies_in_targets.include?(normalize_target(target))
     end
 
     private
