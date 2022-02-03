@@ -90,12 +90,12 @@ module PodAlexandria
 
     def delete(spec)
       name = spec_modules[spec] || module_name(spec)
-      path = "#{destination}/#{name}.framework"
+      paths = Dir["#{destination}/#{name}.{framework,xcframework}"]
       
-      if File.directory?(path)
-        FileUtils.remove_dir(path, true)
+      if !paths.empty?
+        paths.each { |path| FileUtils.remove_dir(path, true) }
       else
-        Pod::UI.warn "🤔  Could not delete #{path}, it does not exist! (this is normal for newly added pods)"
+        Pod::UI.warn "🤔  Could not delete #{destination}/#{name}.(xc)framework, it does not exist! (this is normal for newly added pods)"
       end
     end
 
