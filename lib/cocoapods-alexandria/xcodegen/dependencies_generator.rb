@@ -35,7 +35,7 @@ module PodAlexandria
     end
 
     def self.config_file_for_target(installer_context, target)
-      Dir["#{installer_context.sandbox_root}/Target Support Files/#{target.cocoapods_target_label}/#{target.cocoapods_target_label}.*.xcconfig"]
+      Dir["#{installer_context.sandbox_root}/Target Support Files/#{target.cocoapods_target_label}/#{target.cocoapods_target_label}.*-release.xcconfig"]
         .first
     end
 
