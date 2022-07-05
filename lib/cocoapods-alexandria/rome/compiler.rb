@@ -36,6 +36,7 @@ module PodAlexandria
 
     def skip_build?(target, module_name, sdk)
       File.directory?(destination_path(module_name)) ||
+      File.directory?(build_path(target, module_name, sdk)) ||
         !is_native_target?(target)
     end
 
