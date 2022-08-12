@@ -22,6 +22,7 @@ module PodAlexandria
 
         # may already be built (by another target)
         if File.directory?(build_path(target, sdk))
+          Pod::UI.puts "Already built '#{target.name}'."
           build_path(target, sdk)
         else
           xcodebuild(target, sdk, deployment_target)
@@ -36,8 +37,7 @@ module PodAlexandria
     end
 
     def skip_build?(target, sdk)
-      File.directory?(destination_path(target)) ||
-        File.directory?(build_path(target, sdk))
+      File.directory?(destination_path(target))
     end
 
     def xcodebuild(target, sdk, deployment_target)
