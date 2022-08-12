@@ -55,11 +55,15 @@ module PodAlexandria
     end
 
     def build_path(target, sdk)
-      "#{build_dir}/#{configuration}-#{sdk}/#{target.name}/#{target.product_name}.framework"
+      # Note: using target.product_name is wrong in some cases (Cocoapods project generation bug)
+      # See https://github.com/CocoaPods/CocoaPods/issues/8007
+      "#{build_dir}/#{configuration}-#{sdk}/#{target.name}/#{target.product_reference.name}"
     end
 
     def destination_path(target)
-      "#{destination}/#{target.product_name}.framework"
+      # Note: using target.product_name is wrong in some cases (Cocoapods project generation bug)
+      # See https://github.com/CocoaPods/CocoaPods/issues/8007
+      "#{destination}/#{target.product_reference.name}"
     end
   end
 end
