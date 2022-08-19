@@ -49,7 +49,7 @@ module PodAlexandria
       compiler = Compiler.new(sandbox, build_dir, destination, configuration, flags)
       frameworks = umbrella_targets.select { |t| t.specs.any? }.flat_map { |target|
         compiler.build(target)
-      }
+      }.uniq
 
       Pod::UI.info "🔥  Built #{frameworks.count} #{'frameworks'.pluralize(frameworks.count)}" unless frameworks.empty?
 

@@ -56,13 +56,13 @@ module PodAlexandria
     def build_path(target, sdk)
       # Note: using target.product_name is wrong in some cases (Cocoapods project generation bug)
       # See https://github.com/CocoaPods/CocoaPods/issues/8007
-      "#{build_dir}/#{configuration}-#{sdk}/#{target.name}/#{target.product_reference.name}"
+      "#{build_dir}/#{configuration}-#{sdk}/#{target.name}/#{target.product_reference.path}"
     end
 
     def destination_path(target)
       # Note: using target.product_name is wrong in some cases (Cocoapods project generation bug)
       # See https://github.com/CocoaPods/CocoaPods/issues/8007
-      "#{destination}/#{target.product_reference.name}"
+      "#{destination}/#{target.product_reference.path}"
     end
   end
 end
