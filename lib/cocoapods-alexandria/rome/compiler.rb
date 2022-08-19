@@ -22,11 +22,13 @@ module PodAlexandria
 
         # may already be built (by another target)
         if File.directory?(build_path(target, sdk))
-          Pod::UI.puts "Already built '#{target.name}'."
-          build_path(target, sdk)
+          Pod::UI.puts "Already built '#{target.name}', probably by another dependency."
         else
+          Pod::UI.puts "Building '#{target.name}' for #{sdk}..."
           xcodebuild(target, sdk, deployment_target)
         end
+
+        build_path(target, sdk)
       }.compact
     end
 
@@ -44,10 +46,7 @@ module PodAlexandria
       args = %W(-project #{sandbox.project_path.realdirpath} -scheme #{target.name} -configuration #{configuration} -sdk #{sdk})
       args += flags unless flags.nil? 
       
-      Pod::UI.puts "Building '#{target.name}' for #{sdk}..."
       Pod::Executable.execute_command 'xcodebuild', args, true
-
-      build_path(target, sdk)
     end
 
     def project
