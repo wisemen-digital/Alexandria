@@ -54,15 +54,11 @@ module PodAlexandria
     end
 
     def build_path(target, sdk)
-      # Note: using target.product_name is wrong in some cases (Cocoapods project generation bug)
-      # See https://github.com/CocoaPods/CocoaPods/issues/8007
-      "#{build_dir}/#{configuration}-#{sdk}/#{target.name}/#{target.product_reference.path}"
+      "#{build_dir}/#{configuration}-#{sdk}/#{target.name}/#{target.product_path}"
     end
 
     def destination_path(target)
-      # Note: using target.product_name is wrong in some cases (Cocoapods project generation bug)
-      # See https://github.com/CocoaPods/CocoaPods/issues/8007
-      "#{destination}/#{target.product_reference.path}"
+      "#{destination}/#{target.product_path}"
     end
   end
 end
@@ -86,6 +82,14 @@ module Xcodeproj
             .filter { |d| d.target.is_native? && !d.target.is_bundle? }
             .map { |d| [d.target] + d.target.all_dependencies }
             .flatten.uniq
+        end
+
+        # Note: using target.product_name is wrong in some cases (Cocoapods project generation bug)
+        # See https://github.com/CocoaPods/CocoaPods/issues/8007
+        def product_path
+          extension = File.extname(product_reference.path)
+          module_name = resolved_build_setting('PRODUCT_MODULE_NAME', true).values[0]
+          "#{module_name}#{extension}"
         end
       end
     end
