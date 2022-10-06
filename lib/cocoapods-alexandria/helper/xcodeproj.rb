@@ -6,10 +6,11 @@ module Xcodeproj
         .reject { |c| ['Debug', 'Release'].include? c }
     end
 
-    def fix_deployment_target_warnings
+    def fix_deployment_target_warnings(minimum_version)
       targets.each do |target|
         target.build_configurations.each do |config|
-          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0' if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] == '8.0'
+          version = Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = minimum_version.to_s if version < minimum_version
         end
       end
       save

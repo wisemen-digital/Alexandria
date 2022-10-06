@@ -19,6 +19,7 @@ module PodAlexandria
         Pod::UI.puts "!!DEPRECTATED!! Forcing bitcode generation"
         pods_project.force_bitcode_generation
       end
+      pods_project.fix_deployment_target_warnings(options.minimum_ios_version)
       cache.delete_changed_frameworks
       cache.build_frameworks
       cache.cache_lockfile

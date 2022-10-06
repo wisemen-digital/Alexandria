@@ -11,7 +11,7 @@ module PodAlexandria
 
     def run
       Pod::UI.title "Tweaking CocoaPods for XcodeGen..."
-      pods_project.fix_deployment_target_warnings
+      pods_project.fix_deployment_target_warnings(options.minimum_ios_version)
       include_user_configs_in_pods_xcconfigs
     end
 

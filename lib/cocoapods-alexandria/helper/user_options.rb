@@ -3,6 +3,7 @@ module PodAlexandria
     attr_reader :environment_configs
     attr_reader :disable_bitcode
     attr_reader :force_bitcode
+    attr_reader :minimum_ios_version
     attr_reader :xcodegen_dependencies_file
     attr_reader :do_not_embed_dependencies_in_targets
 
@@ -10,6 +11,7 @@ module PodAlexandria
       @environment_configs = user_options.fetch('environment_configs', default_configurations(installer_context))
       @disable_bitcode = user_options.fetch('disable_bitcode', true)
       @force_bitcode = user_options.fetch('force_bitcode', false)
+      @minimum_ios_version = Gem::Version.new(user_options.fetch('minimum_ios_version', '11.0'))
       @xcodegen_dependencies_file = user_options.fetch('xcodegen_dependencies_file', 'projectDependencies.yml')
       @do_not_embed_dependencies_in_targets = user_options.fetch('do_not_embed_dependencies_in_targets', [])
     end

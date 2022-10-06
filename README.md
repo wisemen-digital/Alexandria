@@ -88,6 +88,21 @@ target 'Alexander' do
 end
 ```
 
+### Minimum iOS Version
+
+By default the minimum iOS version (`IPHONEOS_DEPLOYMENT_TARGET`) of a dependency will be overriden to `11.0` if it is lower than that version. This is to reduce the amount of warnings Xcode will generate for unsupported versions. You can override this minimum version by setting the `minimum_ios_version` flag:
+
+```ruby
+platform :osx, '10.10'
+
+plugin 'cocoapods-alexandria',
+  :minimum_ios_version => '12.0'
+
+target 'Alexander' do
+  pod 'Alamofire'
+end
+```
+
 ### XcodeGen Dependencies File
 
 By default set to `projectDependencies.yml`, this defines the XcodeGen integration file. You can point Alexandria to a custom path using `xcodegen_dependencies_file`:
