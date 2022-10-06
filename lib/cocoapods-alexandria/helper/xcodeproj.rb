@@ -9,7 +9,7 @@ module Xcodeproj
     def fix_deployment_target_warnings
       targets.each do |target|
         target.build_configurations.each do |config|
-          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0' if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] == '8.0'
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0' if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] == '8.0'
         end
       end
       save
