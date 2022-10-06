@@ -16,6 +16,17 @@ module Xcodeproj
       save
     end
 
+    def fix_bundle_code_signing
+      targets.each do |target|
+        if target.respond_to?(:product_type) and target.product_type == 'com.apple.product-type.bundle'
+          target.build_configurations.each do |config|
+            config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+          end
+        end
+      end
+      save
+    end
+
     def disable_bitcode_generation
       targets.each do |target|
         target.build_configurations.each do |config|
