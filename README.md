@@ -72,13 +72,16 @@ On CI, CocoaPods's settings are not used, and instead only the environment confi
 
 ### Bitcode generation
 
-By default, bitcode generation will be enforced. You can set the `force_bitcode` option to `false` to disable this behaviour.
+By default, Bitcode generation will be disabled. You can set the `disable_bitcode` option to `false` to turn off this behaviour. Know that the App Store no longer accepts builds with Bitcode built with Xcode 14 or higher.
+
+**Deprecated**: When this behaviour is disabled, you can additionally force all modules to be compiled with Bitcode by setting the `force_bitcode` flag to `true`.
 
 ```ruby
 platform :osx, '10.10'
 
 plugin 'cocoapods-alexandria',
-  :force_bitcode => false
+  :disable_bitcode => false,
+  :force_bitcode => true
 
 target 'Alexander' do
   pod 'Alamofire'

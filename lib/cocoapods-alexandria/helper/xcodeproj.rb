@@ -15,6 +15,15 @@ module Xcodeproj
       save
     end
 
+    def disable_bitcode_generation
+      targets.each do |target|
+        target.build_configurations.each do |config|
+          config.build_settings['ENABLE_BITCODE'] = 'NO'
+        end
+      end
+      save
+    end
+
     def force_bitcode_generation
       targets.each do |target|
         target.build_configurations.each do |config|

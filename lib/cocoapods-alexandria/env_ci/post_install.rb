@@ -12,8 +12,11 @@ module PodAlexandria
     def run
       Pod::UI.title "Compile dependencies"
       
-      if options.force_bitcode
-        Pod::UI.puts "Forcing bitcode generation"
+      if options.disable_bitcode
+        Pod::UI.puts "Disabling bitcode generation"
+        pods_project.disable_bitcode_generation
+      elsif options.force_bitcode
+        Pod::UI.puts "!!DEPRECTATED!! Forcing bitcode generation"
         pods_project.force_bitcode_generation
       end
       cache.delete_changed_frameworks
